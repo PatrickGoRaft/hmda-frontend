@@ -32,7 +32,7 @@ const wrapLoading = (i = 0) => {
   )
 }
 
-const _whatToRender = ({ filings, institutions, submission, filingPeriod, filingQuarters, latestSubmissions }) => {
+const _whatToRender = ({ filings, institutions, submission, filingPeriod, filingQuarters, latestSubmissions, hasQuarterlyFilers }) => {
 
   // we don't have institutions yet
   if (!institutions.fetched) return wrapLoading()
@@ -106,6 +106,13 @@ const _whatToRender = ({ filings, institutions, submission, filingPeriod, filing
   }).filter(x => x)
 
   if (showingQuarterly) {
+    if(!hasQuarterlyFilers)
+      return (
+        <Alert heading={`Annual filing for ${filingYear} is not open.`} type='warning'>
+          <p></p>
+        </Alert>
+      )
+      
     noFilingThisQ.length &&
       filteredInstitutions.push(
         <FilteredOutList
@@ -140,14 +147,14 @@ const _whatToRender = ({ filings, institutions, submission, filingPeriod, filing
 
 export default class Institutions extends Component {
   render() {
-    const { error, filingPeriod, filingPeriods, filingQuarters, history, location, dispatch } = this.props
+    const { error, filingPeriod, filingPeriods, filingQuarters, hasQuarterlyFilers, history, location, dispatch } = this.props
 
     return (
       <main id="main-content" className="Institutions full-width">
         {error ? <ErrorWarning error={error} /> : null}
         <div className="usa-width-one-whole">
           {filingPeriod ? (
-            <InstitutionsHeader filingPeriod={filingPeriod} filingQuarters={filingQuarters} />
+            <InstitutionsHeader filingPeriodOrig={filingPeriod} filingQuarters={filingQuarters} hasQuarterlyFilers={hasQuarterlyFilers}/>
           ) : null}
 
           <InstitutionPeriodSelector
@@ -156,6 +163,7 @@ export default class Institutions extends Component {
             history={history}
             pathname={location.pathname}
             dispatch={dispatch}
+            hasQuarterlyFilers={hasQuarterlyFilers}
           />
 
           {_whatToRender(this.props)}
