@@ -9,6 +9,7 @@ import InstitutionPeriodSelector from './InstitutionPeriodSelector'
 import Alert from '../../common/Alert.jsx'
 import { FilteredOutList } from './FilteredOutList'
 import { splitYearQuarter } from '../api/utils.js'
+import { formattedQtrBoundaryDate } from '../utils/date.js'
 
 import './Institutions.css'
 
@@ -32,7 +33,16 @@ const wrapLoading = (i = 0) => {
   )
 }
 
-const _whatToRender = ({ filings, institutions, submission, filingPeriod, filingQuarters, latestSubmissions, hasQuarterlyFilers }) => {
+const _whatToRender = ({ 
+  filings,
+  institutions,
+  submission,
+  filingPeriod,
+  filingQuartersLate,
+  latestSubmissions,
+  hasQuarterlyFilers,
+  isPassedQuarter 
+}) => {
 
   // we don't have institutions yet
   if (!institutions.fetched) return wrapLoading()
@@ -99,7 +109,6 @@ const _whatToRender = ({ filings, institutions, submission, filingPeriod, filing
           institution={institution}
           submission={_setSubmission(submission, institutionSubmission, filingObj)}
           submissions={filingObj.submissions}
-          filingQuarters={filingQuarters}
         />
       )
     }
@@ -111,6 +120,18 @@ const _whatToRender = ({ filings, institutions, submission, filingPeriod, filing
         <Alert heading={`Annual filing for ${filingYear} is not open.`} type='warning'>
           <p></p>
         </Alert>
+      )
+    
+    if(isPassedQuarter)
+      filteredInstitutions.unshift(
+        <div className='review-only'>
+          <h4>For Review Only</h4>
+          The following information reflects your filing status as of{' '}
+          {formattedQtrBoundaryDate(showingQuarterly, filingQuartersLate, 1)},{' '}
+          {filingYear}
+          .<br />
+          <strong>No further modifications are possible at this time.</strong>
+        </div>
       )
       
     noFilingThisQ.length &&
@@ -147,7 +168,17 @@ const _whatToRender = ({ filings, institutions, submission, filingPeriod, filing
 
 export default class Institutions extends Component {
   render() {
-    const { error, filingPeriod, filingPeriods, filingQuarters, filingQuartersLate, hasQuarterlyFilers, history, location, dispatch } = this.props
+    const {
+      error,
+      filingPeriod,
+      filingPeriods,
+      filingQuarters,
+      filingQuartersLate,
+      hasQuarterlyFilers,
+      history,
+      location,
+      dispatch
+    } = this.props
 
     return (
       <main id="main-content" className="Institutions full-width">
