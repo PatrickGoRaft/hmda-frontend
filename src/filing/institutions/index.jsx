@@ -109,6 +109,7 @@ const _whatToRender = ({
           institution={institution}
           submission={_setSubmission(submission, institutionSubmission, filingObj)}
           submissions={filingObj.submissions}
+          isPassedQuarter={isPassedQuarter}
         />
       )
     }
